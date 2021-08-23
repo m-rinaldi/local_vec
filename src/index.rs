@@ -30,5 +30,23 @@ impl<T, const N: usize> std::ops::IndexMut<usize> for StackVec<T, N> {
     }
 }
 
+#[cfg(test)]
+mod tests {
+    use crate::StackVec;
+
+    #[test]
+    fn test_index() {
+        let mut vec = StackVec::<_, 3>::new();
+
+        vec.push(0);
+        vec.push(1);
+        vec.push(2);
+
+        assert_eq!(vec[0], 0);
+        assert_eq!(vec[1], 1);
+        assert_eq!(vec[2], 2);
+    }
+}
+
 
 
