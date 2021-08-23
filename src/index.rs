@@ -46,6 +46,28 @@ mod tests {
         assert_eq!(vec[1], 1);
         assert_eq!(vec[2], 2);
     }
+
+    #[test]
+    fn test_index_mut() {
+        let mut vec = StackVec::<_, 3>::new();
+
+        vec.push(0);
+        vec.push(1);
+        vec.push(2);
+
+        assert_eq!(vec[0], 0);
+        assert_eq!(vec[1], 1);
+        assert_eq!(vec[2], 2);
+
+        vec[0] += 1;
+        assert_eq!(vec[0], 1);
+
+        vec[1] += 1;
+        assert_eq!(vec[1], 2);
+
+        vec[2] += 1;
+        assert_eq!(vec[2], 3);
+    }
 }
 
 
