@@ -1,6 +1,6 @@
-use crate::StackVec;
+use crate::LocalVec;
 
-impl<T, const N: usize> std::ops::Index<usize> for StackVec<T, N> {
+impl<T, const N: usize> std::ops::Index<usize> for LocalVec<T, N> {
     type Output = T;
 
     fn index(&self, idx: usize) -> &Self::Output {
@@ -16,7 +16,7 @@ impl<T, const N: usize> std::ops::Index<usize> for StackVec<T, N> {
     }
 }
 
-impl<T, const N: usize> std::ops::IndexMut<usize> for StackVec<T, N> {
+impl<T, const N: usize> std::ops::IndexMut<usize> for LocalVec<T, N> {
     fn index_mut(&mut self, idx: usize) -> &mut Self::Output {
         if idx >= self.len {
             panic!("out of bounds access");
@@ -32,11 +32,11 @@ impl<T, const N: usize> std::ops::IndexMut<usize> for StackVec<T, N> {
 
 #[cfg(test)]
 mod tests {
-    use crate::StackVec;
+    use crate::LocalVec;
 
     #[test]
     fn test_index() {
-        let mut vec = StackVec::<_, 3>::new();
+        let mut vec = LocalVec::<_, 3>::new();
 
         vec.push(0);
         vec.push(1);
@@ -49,7 +49,7 @@ mod tests {
 
     #[test]
     fn test_index_mut() {
-        let mut vec = StackVec::<_, 3>::new();
+        let mut vec = LocalVec::<_, 3>::new();
 
         vec.push(0);
         vec.push(1);
