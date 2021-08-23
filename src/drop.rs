@@ -1,6 +1,6 @@
-use crate::StackVec;
+use crate::LocalVec;
 
-impl <T, const N: usize> Drop for StackVec<T, N> {
+impl <T, const N: usize> Drop for LocalVec<T, N> {
     fn drop(&mut self) {
         self.clear();
     }
@@ -25,12 +25,12 @@ mod tests {
         }
     }
 
-    use crate::StackVec;
+    use crate::LocalVec;
 
     #[test]
     fn test_drop() {
         let mut cnt = 0u8;
-        let mut buf = StackVec::<_, 3>::new();
+        let mut buf = LocalVec::<_, 3>::new();
 
         assert_eq!(cnt, 0);
 

@@ -5,18 +5,18 @@ mod index;
 
 #[derive(Debug)]
 /// A fixed-capacity vector that directly stores its elements  
-pub struct StackVec<T, const N: usize> {
+pub struct LocalVec<T, const N: usize> {
     buf: [MaybeUninit<T>; N],
     len: usize,
 }
 
-impl<T, const N: usize> StackVec<T, N> {
+impl<T, const N: usize> LocalVec<T, N> {
     pub fn new() -> Self {
         let buf: [MaybeUninit<T>; N] = unsafe {
             MaybeUninit::uninit().assume_init()
         };
 
-        StackVec {
+        LocalVec {
             buf,
             len: 0,
         }
@@ -38,7 +38,7 @@ impl<T, const N: usize> StackVec<T, N> {
         N
     }
 
-    /// It panics if the vector is full
+    /// panics if the vector is full
     pub fn push(&mut self, val: T) {
         if self.len >= N {
             panic!("capacity excedeed");
@@ -70,11 +70,11 @@ impl<T, const N: usize> StackVec<T, N> {
 
 #[cfg(test)]
 mod tests {
-    use super::StackVec;
+    use super::LocalVec;
 
     #[test]
     fn test_new() {
-        let vec = StackVec::<u32, 4>::new();
+        let vec = LocalVec::<u32, 4>::new();
         assert_eq!(vec.len(), 0);
         assert_eq!(vec.capacity(), 4);
     }
@@ -82,7 +82,7 @@ mod tests {
     #[test]
     #[should_panic]
     fn test_push_on_full() {
-        let mut vec = StackVec::<_, 1>::new();
+        let mut vec = LocalVec::<_, 1>::new();
         vec.push(0);
 
         assert!(vec.is_full());
@@ -92,7 +92,7 @@ mod tests {
 
     #[test]
     fn test_push() {
-        let mut vec = StackVec::<_, 3>::new();
+        let mut vec = LocalVec::<_, 3>::new();
 
         assert!(vec.is_empty());
         assert_eq!(vec.len(), 0);
@@ -110,7 +110,7 @@ mod tests {
 
     #[test]
     fn test_pop_on_empty() {
-        let mut vec = StackVec::<_, 1>::new();
+        let mut vec = LocalVec::<_, 1>::new();
         assert!(vec.is_empty());
         matches!(vec.pop(), None);
 
@@ -124,7 +124,7 @@ mod tests {
 
     #[test]
     fn test_push_and_pop() {
-        let mut vec = StackVec::<_, 4>::new();
+        let mut vec = LocalVec::<_, 4>::new();
         assert!(vec.is_empty());
         matches!(vec.pop(), None);
 
@@ -141,7 +141,7 @@ mod tests {
 
     #[test]
     fn test_clear() {
-        let mut vec = StackVec::<_,3>::new();
+        let mut vec = LocalVec::<_,3>::new();
         vec.clear();
         assert!(vec.is_empty());
 

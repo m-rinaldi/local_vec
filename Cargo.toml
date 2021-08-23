@@ -1,10 +1,10 @@
 [package]
-name = "stack_vec"
+name = "local_vec"
 version = "0.1.0"
 edition = "2018"
 authors = ["Jorge Rinaldi <jrg.rinaldi@gmail.com>"]
 license = "MIT"
-repository = "https://github.com/m-rinaldi/stack_vec"
+repository = "https://github.com/m-rinaldi/local_vec"
 description = "fixed-capacity vector allocated on the stack"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
