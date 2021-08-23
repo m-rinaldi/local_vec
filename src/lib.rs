@@ -1,7 +1,7 @@
 use std::mem::MaybeUninit;
 
 mod drop;
-
+mod index;
 
 #[derive(Debug)]
 /// A fixed-capacity vector that directly stores its elements  
@@ -120,6 +120,23 @@ mod tests {
 
         // empty again
         matches!(vec.pop(), None);
+    }
+
+    #[test]
+    fn test_push_and_pop() {
+        let mut vec = StackVec::<_, 4>::new();
+        assert!(vec.is_empty());
+        matches!(vec.pop(), None);
+
+        vec.push(0);
+        vec.push(1);
+        vec.push(2);
+        vec.push(3);
+
+        assert_eq!(vec.pop(), Some(3));
+        assert_eq!(vec.pop(), Some(2));
+        assert_eq!(vec.pop(), Some(1));
+        assert_eq!(vec.pop(), Some(0));
     }
 
     #[test]
