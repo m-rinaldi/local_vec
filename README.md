@@ -16,14 +16,14 @@ A *fixed-capacity* vector allocated on the stack.
     vec.push(3);
     vec.push(7);
     
-`vec` contents in the code above is graphically represented as:
+`vec` contents in the code above are graphically represented as:
 
 <p align="center">
   <img src="img/StackVec.png">
 </p>
 
 
-In contrast, [`Vec`](https://doc.rust-lang.org/std/vec/struct.Vec.html) allocates a buffer on the heap and only contains a pointer to that buffer.
+In contrast, [`Vec`](https://doc.rust-lang.org/std/vec/struct.Vec.html) allocates a buffer on the heap and contains a pointer to that buffer instead of the buffer itself.
 
 
 The capacity of a `StackVec` must be determined at compile-time as a constant argument.
