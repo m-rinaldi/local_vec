@@ -1,5 +1,7 @@
 use std::mem::MaybeUninit;
 
+mod drop;
+
 
 #[derive(Debug)]
 /// A fixed-capacity vector that directly stores its elements  
