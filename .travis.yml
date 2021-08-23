@@ -1,2 +1,7 @@
 language: rust
 
+# safelist
+branches:
+  only:
+  - main
+
