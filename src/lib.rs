@@ -183,4 +183,12 @@ mod tests {
 
         assert_eq!(vec.len(), 4);
     }
+
+    #[test]
+    fn test_from_smaller_array() {
+        let arr = [0; 4];
+        let vec = LocalVec::<_, 6>::from_array(arr);
+
+        assert_eq!(vec.len(), 4);
+    }
 }
