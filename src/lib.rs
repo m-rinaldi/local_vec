@@ -22,6 +22,19 @@ impl<T, const N: usize> LocalVec<T, N> {
         }
     }
 
+    pub fn from_array<const M: usize>(arr: [T; M]) -> Self {
+        // TODO check at compile time
+        assert!(M <= N, "can't store {} elements with a capacity of {}", M, N);
+
+        // TODO rewrite with Extend::extends()
+        let mut vec = Self::new();
+        for elem in arr {
+            vec.push(elem);
+        }
+
+        vec
+    }
+
     pub fn is_empty(&self) -> bool {
         0 == self.len
     }
@@ -154,5 +167,28 @@ mod tests {
 
         vec.clear();
         assert!(vec.is_empty());
+    }
+
+    #[test]
+    #[should_panic]
+    fn test_from_capacity_exceeding_array() {
+        let arr = [0; 4];
+        let _ = LocalVec::<_,3>::from_array(arr);
+    }
+
+    #[test]
+    fn test_from_array() {
+        let arr = [0; 4];
+        let vec = LocalVec::<_, 4>::from_array(arr);
+
+        assert_eq!(vec.len(), 4);
+    }
+
+    #[test]
+    fn test_from_smaller_array() {
+        let arr = [0; 4];
+        let vec = LocalVec::<_, 6>::from_array(arr);
+
+        assert_eq!(vec.len(), 4);
     }
 }
