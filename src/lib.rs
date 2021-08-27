@@ -175,4 +175,12 @@ mod tests {
         let arr = [0; 4];
         let _ = LocalVec::<_,3>::from_array(arr);
     }
+
+    #[test]
+    fn test_from_array() {
+        let arr = [0; 4];
+        let vec = LocalVec::<_, 4>::from_array(arr);
+
+        assert_eq!(vec.len(), 4);
+    }
 }
