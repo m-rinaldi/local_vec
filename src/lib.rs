@@ -22,6 +22,19 @@ impl<T, const N: usize> LocalVec<T, N> {
         }
     }
 
+    pub fn from_array<const M: usize>(arr: [T; M]) -> Self {
+        // TODO check at compile time
+        assert!(M <= N, "can't store {} elements with a capacity of {}", M, N);
+
+        // TODO rewrite with Extend::extends()
+        let mut vec = Self::new();
+        for elem in arr {
+            vec.push(elem);
+        }
+
+        vec
+    }
+
     pub fn is_empty(&self) -> bool {
         0 == self.len
     }
@@ -70,6 +83,8 @@ impl<T, const N: usize> LocalVec<T, N> {
 
 #[cfg(test)]
 mod tests {
+    use std::thread::LocalKey;
+
     use super::LocalVec;
 
     #[test]
