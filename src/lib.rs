@@ -83,8 +83,6 @@ impl<T, const N: usize> LocalVec<T, N> {
 
 #[cfg(test)]
 mod tests {
-    use std::thread::LocalKey;
-
     use super::LocalVec;
 
     #[test]
@@ -169,5 +167,12 @@ mod tests {
 
         vec.clear();
         assert!(vec.is_empty());
+    }
+
+    #[test]
+    #[should_panic]
+    fn test_from_capacity_exceeding_array() {
+        let arr = [0; 4];
+        let _ = LocalVec::<_,3>::from_array(arr);
     }
 }
