@@ -1,6 +1,6 @@
 # `local_vec`
 
-A *fixed-capacity* vector whose elements <b>stored *locally*</b>. In particular, they can be allocated on the [stack](#allocating-on-the-stack-or-the-heap).
+A *fixed-capacity* vector whose elements are <b>stored *locally*</b>. In particular, they can be allocated on the [stack](#allocating-on-the-stack-or-the-heap).
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Build Status](https://app.travis-ci.com/m-rinaldi/local_vec.svg?branch=main)](https://app.travis-ci.com/m-rinaldi/local_vec)
