@@ -9,7 +9,7 @@ A *fixed-capacity* vector whose elements <b>stored *locally*</b>. In particular,
 
 `LocalVec` is a *fixed-capacity* vector, i.e., its *size* or *length* increases and decreases as elements are pushed into and popped from the vector, respectively. However, its *capacity* remains always the same and must be determined at [compile time](#compile-time-capacity).
 
-The elements of a `LocalVec` are stored on a local buffer inside the `LocalVec` itself.
+The elements of a `LocalVec` are stored on a *local buffer* inside the `LocalVec` itself, not on a *remote buffer* allocated on the heap.
 
 ---
 
@@ -33,8 +33,12 @@ That is, `vec` has a *local buffer* and the `i32` values `3` and `7` are stored 
 
 In contrast, [`Vec`](https://doc.rust-lang.org/std/vec/struct.Vec.html) allocates a *remote* buffer on the heap and contains a pointer to that buffer instead of the buffer itself:
 
-    let mut vec = Vec::with_capacity(4);
-    vec.extend([3, 7]);
+    let mut v = Vec::with_capacity(4);
+    v.extend([3, 7]);
+    
+<p align="center">
+  <img src="img/Vec.png">
+</p>
 
 ### Compile-time capacity
 
