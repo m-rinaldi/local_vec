@@ -1,17 +1,19 @@
 # `local_vec`
 
-A *fixed-capacity* vector whose elements stored *locally*. In particular, they can be allocated on the [stack](#allocating-on-the-stack-or-the-heap).
+A *fixed-capacity* vector whose elements <b>stored *locally*</b>. In particular, they can be allocated on the [stack](#allocating-on-the-stack-or-the-heap).
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Build Status](https://app.travis-ci.com/m-rinaldi/local_vec.svg?branch=main)](https://app.travis-ci.com/m-rinaldi/local_vec)
 
 ---
 
-`local_vec::LocalVec` is a *fixed-capacity* vector, i.e., its *size* or *length* increases and decreases as elements are pushed into and popped from the vector, respectively. However, its *capacity* remains always the same and must be determined at compile time.
+`LocalVec` is a *fixed-capacity* vector, i.e., its *size* or *length* increases and decreases as elements are pushed into and popped from the vector, respectively. However, its *capacity* remains always the same and must be determined at [compile time](#compile-time-capacity).
+
+The elements of a `LocalVec` are stored on a local buffer inside the `LocalVec` itself.
 
 ---
 
-### `LocalVec` vs `Vec`
+### `LocalVec` *vs* `Vec`
 
 `LocalVec`'s elements reside locally, i.e., inside it:
 
@@ -26,18 +28,22 @@ A *fixed-capacity* vector whose elements stored *locally*. In particular, they c
   <img src="img/LocalVec.png">
 </p>
 
-That is, the `i32` values `3` and `7` are stored inside `vec`, not remotelly allocated on the heap.
+That is, `vec` has a *local buffer* and the `i32` values `3` and `7` are stored inside `vec` itself, not in a *remotelly*-allocated buffer on the heap.
 
 
-In contrast, [`Vec`](https://doc.rust-lang.org/std/vec/struct.Vec.html) allocates a buffer on the heap and contains a pointer to that buffer instead of the buffer itself:
+In contrast, [`Vec`](https://doc.rust-lang.org/std/vec/struct.Vec.html) allocates a *remote* buffer on the heap and contains a pointer to that buffer instead of the buffer itself:
 
     let mut vec = Vec::with_capacity(4);
     vec.extend([3, 7]);
 
+### Compile-time capacity
 
-The capacity of a `LocalVec` must be determined at compile-time as a constant argument thanks to *const generics*.
+Since the size of a `LocalValue` depends on its capacity, the capacity of a `LocalVec` must be determined at compile time. This is achieved with a constant generic argument thanks to *const generics*:
 
----
+    let mut vec = LocalVec::<i32, 4>::new();
+                                  |
+        const generic argument <--|
+
 
 ### Allocating on the Stack or the Heap
 
