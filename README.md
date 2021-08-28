@@ -1,13 +1,17 @@
 # `local_vec`
 
-A *fixed-capacity* vector whose elements allocated locally – it can be on the stack<sup>[X](#allocated-on the-stack-or-the-heap?)</sup>.
+A *fixed-capacity* vector whose elements stored *locally* – it can be on the [stack](#allocated-on the-stack-or-the-heap?).
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Build Status](https://app.travis-ci.com/m-rinaldi/local_vec.svg?branch=main)](https://app.travis-ci.com/m-rinaldi/local_vec)
 
 ---
 
-`local_vec::LocalVec` is a *fixed-capacity* vector, i.e., its *size* or *length* increases and decreases as elements are pushed into and popped from the vector, respectively. However, its *capacity* remains always the same.
+`local_vec::LocalVec` is a *fixed-capacity* vector, i.e., its *size* or *length* increases and decreases as elements are pushed into and popped from the vector, respectively. However, its *capacity* remains always the same and must be determined at compile time.
+
+---
+
+### `LocalVec` vs `Vec`
 
 `LocalVec`'s elements reside locally, i.e., inside it:
 
@@ -21,6 +25,8 @@ A *fixed-capacity* vector whose elements allocated locally – it can be on the 
 <p align="center">
   <img src="img/LocalVec.png">
 </p>
+
+That is, the `i32` values `3` and `7` are stored inside `vec`, not remotelly allocated on the heap.
 
 
 In contrast, [`Vec`](https://doc.rust-lang.org/std/vec/struct.Vec.html) allocates a buffer on the heap and contains a pointer to that buffer instead of the buffer itself:
