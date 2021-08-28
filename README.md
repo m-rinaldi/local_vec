@@ -1,6 +1,6 @@
 # `local_vec`
 
-A *fixed-capacity* vector whose elements stored *locally* – it can be on the [stack](#allocated-on the-stack-or-the-heap?).
+A *fixed-capacity* vector whose elements stored *locally* – it can be on the [stack](#xxx).
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Build Status](https://app.travis-ci.com/m-rinaldi/local_vec.svg?branch=main)](https://app.travis-ci.com/m-rinaldi/local_vec)
@@ -39,7 +39,7 @@ The capacity of a `LocalVec` must be determined at compile-time as a constant ar
 
 ---
 
-### Allocated on the Stack or the Heap?
+### xxx
 
 Technically, the elements `LocalVec` contains are *locally* stored in the `LocalVec` itself. Whether these elements are on the stack or not, depends on whether the `LocalVec` itself is allocated on the stack. For example:
 
