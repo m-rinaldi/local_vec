@@ -2,6 +2,7 @@ use std::mem::MaybeUninit;
 
 mod drop;
 mod index;
+mod from;
 
 #[derive(Debug)]
 /// A fixed-capacity vector that directly stores its elements  
@@ -22,6 +23,7 @@ impl<T, const N: usize> LocalVec<T, N> {
         }
     }
 
+    // TODO implement From<[T; N]> on top of this?
     pub fn from_array<const M: usize>(arr: [T; M]) -> Self {
         // TODO check at compile time
         assert!(M <= N, "can't store {} elements with a capacity of {}", M, N);
