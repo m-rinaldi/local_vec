@@ -47,4 +47,27 @@ mod tests {
         assert_eq!(cnt, 0);
     }
 
+    #[test]
+    fn test_drop_after_set_len() {
+        let mut cnt = 0u8;
+        let mut buf = LocalVec::<_, 3>::new();
+
+        assert_eq!(cnt, 0);
+
+        buf.push(CounterGuard::new(&mut cnt));
+        assert_eq!(cnt, 1);
+
+        buf.push(CounterGuard::new(&mut cnt));
+        assert_eq!(cnt, 2);
+
+        buf.push(CounterGuard::new(&mut cnt));
+        assert_eq!(cnt, 3);
+
+        unsafe {
+            buf.set_len(1);
+        }
+
+        std::mem::drop(buf);
+        assert_eq!(cnt, 2);
+    }
 }
