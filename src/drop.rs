@@ -70,4 +70,27 @@ mod tests {
         std::mem::drop(buf);
         assert_eq!(cnt, 2);
     }
+
+    #[test]
+    fn test_drop_after_into_array() {
+        let mut cnt = 0u8;
+        let mut buf = LocalVec::<_, 3>::new();
+
+        assert_eq!(cnt, 0);
+
+        buf.push(CounterGuard::new(&mut cnt));
+        assert_eq!(cnt, 1);
+
+        buf.push(CounterGuard::new(&mut cnt));
+        assert_eq!(cnt, 2);
+
+        buf.push(CounterGuard::new(&mut cnt));
+        assert_eq!(cnt, 3);
+
+        let arr: [_; 3] = buf.into();
+        assert_eq!(cnt, 3);
+
+        std::mem::drop(arr);
+        assert_eq!(cnt, 0);
+    }
 }
