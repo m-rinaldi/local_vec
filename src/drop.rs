@@ -93,4 +93,28 @@ mod tests {
         std::mem::drop(arr);
         assert_eq!(cnt, 0);
     }
+
+    #[test]
+    fn test_drop_after_take_array() {
+        let mut cnt = 0u8;
+        let mut buf = LocalVec::<_, 3>::new();
+
+        assert_eq!(cnt, 0);
+
+        buf.push(CounterGuard::new(&mut cnt));
+        assert_eq!(cnt, 1);
+
+        buf.push(CounterGuard::new(&mut cnt));
+        assert_eq!(cnt, 2);
+
+        buf.push(CounterGuard::new(&mut cnt));
+        assert_eq!(cnt, 3);
+
+        let arr = buf.take_array();
+        assert_eq!(buf.len(), 0);
+        assert_eq!(cnt, 3);
+
+        std::mem::drop(arr);
+        assert_eq!(cnt, 0);
+    }
 }
