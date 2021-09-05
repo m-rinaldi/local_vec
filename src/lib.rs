@@ -85,6 +85,15 @@ impl<T, const N: usize> LocalVec<T, N> {
         }
         debug_assert_eq!(self.len, 0);
     }
+
+    /// steal the elements stored
+    pub fn take_array(&mut self) -> [T; N] {
+        let arr: [T; N] = unsafe {
+            self.set_len(0);
+            std::mem::transmute_copy(&self.buf)
+        };
+        arr
+    }
 }
 
 #[cfg(test)]
