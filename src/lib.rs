@@ -86,7 +86,7 @@ impl<T, const N: usize> LocalVec<T, N> {
         debug_assert_eq!(self.len, 0);
     }
 
-    // TODO must_use
+    #[must_use = "consider using clear() instead"]
     /// steal the elements stored
     pub fn take_array(&mut self) -> [T; N] {
         let arr: [T; N] = unsafe {
