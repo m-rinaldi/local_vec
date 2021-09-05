@@ -85,6 +85,16 @@ impl<T, const N: usize> LocalVec<T, N> {
         }
         debug_assert_eq!(self.len, 0);
     }
+
+    #[must_use = "consider using clear() instead"]
+    /// steal the elements stored
+    pub fn take_array(&mut self) -> [T; N] {
+        let arr: [T; N] = unsafe {
+            self.set_len(0);
+            std::mem::transmute_copy(&self.buf)
+        };
+        arr
+    }
 }
 
 #[cfg(test)]
@@ -208,5 +218,14 @@ mod tests {
             vec.set_len(1);
         }
         assert_eq!(vec.len(), 1);
+    }
+
+    #[test]
+    fn test_take_array() {
+        let arr = [7; 4];
+        let mut vec = LocalVec::<_, 6>::from_array(arr);
+        assert_eq!(vec.len(), 4);
+        let _ = vec.take_array();
+        assert_eq!(vec.len(), 0);
     }
 }
