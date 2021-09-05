@@ -47,6 +47,10 @@ impl<T, const N: usize> LocalVec<T, N> {
         self.len
     }
 
+    pub unsafe fn set_len(&mut self, len: usize) {
+        self.len = len;
+    }
+
     pub fn capacity(&self) -> usize {
         N
     }
