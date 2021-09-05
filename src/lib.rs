@@ -195,4 +195,16 @@ mod tests {
 
         assert_eq!(vec.len(), 4);
     }
+
+    #[test]
+    fn test_set_len() {
+        let arr = [7; 4];
+        let mut vec = LocalVec::<_, 6>::from_array(arr);
+
+        assert_eq!(vec.len(), 4);
+        unsafe {
+            vec.set_len(1);
+        }
+        assert_eq!(vec.len(), 1);
+    }
 }
