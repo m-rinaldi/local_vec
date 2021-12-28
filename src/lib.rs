@@ -107,6 +107,17 @@ impl<T, const N: usize> LocalVec<T, N> {
         assert!(!ptr.is_null());
         ptr
     }
+
+    #[inline]
+    pub fn as_mut_ptr(&mut self) -> *mut T {
+        if N == 0 {
+            return std::ptr::null_mut();
+        }
+
+        let ptr = self.buf[0].as_mut_ptr();
+        assert!(!ptr.is_null());
+        ptr
+    }
 }
 
 #[cfg(test)]
@@ -246,13 +257,28 @@ mod tests {
         let arr = [0xff; 3];
         let vec = LocalVec::<_, 8>::from_array(arr);
         let ptr = vec.as_ptr();
-        assert_eq!(ptr, &vec[0]);
+        assert_eq!(ptr, &vec[0] as *const i32);
+    }
+
+    #[test]
+    fn test_as_mut_ptr() {
+        let arr = [0xff; 3];
+        let mut vec = LocalVec::<_, 8>::from_array(arr);
+        let ptr = vec.as_mut_ptr();
+        assert_eq!(ptr, &mut vec[0] as *mut i32);
     }
 
     #[test]
     fn test_as_ptr_zero_size() {
         let vec = LocalVec::<u8, 0>::new();
         let ptr = vec.as_ptr();
+        assert!(ptr.is_null());
+    }
+
+    #[test]
+    fn test_as_mut_ptr_zero_size() {
+        let mut vec = LocalVec::<u8, 0>::new();
+        let ptr = vec.as_mut_ptr();
         assert!(ptr.is_null());
     }
 }
