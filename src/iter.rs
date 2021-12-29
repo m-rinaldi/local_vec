@@ -27,10 +27,3 @@ impl<T, const N: usize> Iterator for LocalVecIter<T, N> {
         self.elems.pop()
     }
 }
-
-impl<T, const N: usize> Drop for LocalVecIter<T, N> {
-    fn drop(&mut self) {
-        // we pay the price even if T doesn't implement Drop
-        let _ = self.last();
-    }
-}
