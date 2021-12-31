@@ -4,6 +4,8 @@ mod drop;
 mod index;
 mod from;
 mod deref;
+mod iter;
+mod extend;
 
 #[derive(Debug)]
 /// A fixed-capacity vector that directly stores its elements  
