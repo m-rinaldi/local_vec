@@ -27,3 +27,35 @@ impl<T, const N: usize> Iterator for LocalVecIter<T, N> {
         self.elems.pop()
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::LocalVec;
+
+    #[test]
+    fn test_iter() {
+        let vec = LocalVec::<_, 3>::from_array([1, 2, 3]);
+        let mut iter = vec.into_iter();
+        matches!(iter.next(), Some(1));
+        matches!(iter.next(), Some(2));
+        matches!(iter.next(), Some(3));
+        matches!(iter.next(), None);
+        matches!(iter.next(), None);
+    }
+
+    #[test]
+    fn test_iter_empty() {
+        let vec = LocalVec::<usize, 2>::new();
+        let mut iter = vec.into_iter();
+        matches!(iter.next(), None);
+        matches!(iter.next(), None);
+    }
+
+    #[test]
+    fn test_iter_zero_cap() {
+        let vec = LocalVec::<usize, 0>::new();
+        let mut iter = vec.into_iter();
+        matches!(iter.next(), None);
+        matches!(iter.next(), None);
+    }
+}
