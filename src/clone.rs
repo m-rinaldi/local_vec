@@ -1,6 +1,6 @@
-use crate::LocalVec;
+use crate::LocalVecImpl;
 
-impl<T: Clone, const N: usize> Clone for LocalVec<T, N> {
+impl<T: Clone, const N: usize> Clone for LocalVecImpl<T, N> {
     fn clone(&self) -> Self {
         let mut cloned = Self::new();
         for i in 0..self.len() {
@@ -17,7 +17,7 @@ mod tests {
 
     #[test]
     fn test_clone() {
-        let vec = LocalVec::<_, 3>::from_array([1, 2, 3]);
+        let vec = LocalVecImpl::<_, 3>::from_array([1, 2, 3]);
         let cloned = vec.clone();
         assert_eq!(vec, cloned);
     }

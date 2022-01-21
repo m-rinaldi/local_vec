@@ -2,6 +2,8 @@ use crate::LocalVec;
 
 impl <T, const N: usize> Drop for LocalVec<T, N> {
     fn drop(&mut self) {
+        // TODO check the dropping order
+        // it should be the same as in a built-in array
         self.clear();
     }
 }

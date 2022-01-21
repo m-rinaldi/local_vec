@@ -9,29 +9,57 @@ mod iter;
 mod extend;
 mod eq;
 
-#[derive(Debug)]
 /// A fixed-capacity vector that directly stores its elements  
-pub struct LocalVec<T, const N: usize> {
+#[derive(Eq, PartialEq, Clone, Debug)]
+pub struct LocalVec<T, const N: usize>(LocalVecImpl<T, N>);
+
+/// /// A fixed-capacity vector, for Copy types, that directly stores its elements 
+#[derive(Eq, PartialEq, Copy, Clone, Debug)]
+pub struct CopyLocalVec<T: Copy, const N: usize>(LocalVecImpl<T, N>);
+
+#[derive(Copy, Debug)]
+pub struct LocalVecImpl<T, const N: usize> {
     buf: [MaybeUninit<T>; N],
     len: LenType,
 }
 
+// TODO use instead of usize
 type LenType = usize;
 
 impl<T, const N: usize> LocalVec<T, N> {
     pub fn new() -> Self {
+        Self(LocalVecImpl::new())
+    }
+
+    pub fn from_array<const M: usize>(arr: [T; M]) -> Self {
+        Self(LocalVecImpl::from_array(arr))
+    }
+}
+
+impl<T: Copy, const N: usize> CopyLocalVec<T, N> {
+    pub fn new() -> Self {
+        Self(LocalVecImpl::new())
+    }
+
+    pub fn from_array<const M: usize>(arr: [T; M]) -> Self {
+        Self(LocalVecImpl::from_array(arr))
+    }
+}
+
+impl<T, const N: usize> LocalVecImpl<T, N> {
+    fn new() -> Self {
         let buf: [MaybeUninit<T>; N] = unsafe {
             MaybeUninit::uninit().assume_init()
         };
 
-        LocalVec {
+        LocalVecImpl {
             buf,
             len: 0,
         }
     }
 
     // TODO implement From<[T; N]> on top of this?
-    pub fn from_array<const M: usize>(arr: [T; M]) -> Self {
+    fn from_array<const M: usize>(arr: [T; M]) -> Self {
         // TODO check at compile time
         assert!(M <= N, "can't store {} elements with a capacity of {}", M, N);
 
@@ -126,13 +154,41 @@ impl<T, const N: usize> LocalVec<T, N> {
     }
 }
 
+impl<T, const N: usize> std::ops::Deref for LocalVec<T, N> {
+    type Target = LocalVecImpl<T, N>;
+
+    fn deref(&self) -> &Self::Target {
+        &self.0
+    }
+}
+
+impl<T: Copy, const N: usize> std::ops::Deref for CopyLocalVec<T, N> {
+    type Target = LocalVecImpl<T, N>;
+
+    fn deref(&self) -> &Self::Target {
+        &self.0
+    }
+}
+
+impl<T, const N: usize> std::ops::DerefMut for LocalVec<T, N> {
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        &mut self.0
+    }
+}
+
+impl<T: Copy, const N: usize> std::ops::DerefMut for CopyLocalVec<T, N> {
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        &mut self.0
+    }
+}
+
 #[cfg(test)]
 mod tests {
-    use super::LocalVec;
+    use super::LocalVecImpl;
 
     #[test]
     fn test_new() {
-        let vec = LocalVec::<u32, 4>::new();
+        let vec = LocalVecImpl::<u32, 4>::new();
         assert_eq!(vec.len(), 0);
         assert_eq!(vec.capacity(), 4);
     }
@@ -140,7 +196,7 @@ mod tests {
     #[test]
     #[should_panic]
     fn test_push_on_full() {
-        let mut vec = LocalVec::<_, 1>::new();
+        let mut vec = LocalVecImpl::<_, 1>::new();
         vec.push(0);
 
         assert!(vec.is_full());
@@ -150,7 +206,7 @@ mod tests {
 
     #[test]
     fn test_push() {
-        let mut vec = LocalVec::<_, 3>::new();
+        let mut vec = LocalVecImpl::<_, 3>::new();
 
         assert!(vec.is_empty());
         assert_eq!(vec.len(), 0);
@@ -168,7 +224,7 @@ mod tests {
 
     #[test]
     fn test_pop_on_empty() {
-        let mut vec = LocalVec::<_, 1>::new();
+        let mut vec = LocalVecImpl::<_, 1>::new();
         assert!(vec.is_empty());
         matches!(vec.pop(), None);
 
@@ -182,7 +238,7 @@ mod tests {
 
     #[test]
     fn test_push_and_pop() {
-        let mut vec = LocalVec::<_, 4>::new();
+        let mut vec = LocalVecImpl::<_, 4>::new();
         assert!(vec.is_empty());
         matches!(vec.pop(), None);
 
@@ -199,7 +255,7 @@ mod tests {
 
     #[test]
     fn test_clear() {
-        let mut vec = LocalVec::<_,3>::new();
+        let mut vec = LocalVecImpl::<_,3>::new();
         vec.clear();
         assert!(vec.is_empty());
 
@@ -218,13 +274,13 @@ mod tests {
     #[should_panic]
     fn test_from_capacity_exceeding_array() {
         let arr = [0; 4];
-        let _ = LocalVec::<_,3>::from_array(arr);
+        let _ = LocalVecImpl::<_,3>::from_array(arr);
     }
 
     #[test]
     fn test_from_array() {
         let arr = [0; 4];
-        let vec = LocalVec::<_, 4>::from_array(arr);
+        let vec = LocalVecImpl::<_, 4>::from_array(arr);
 
         assert_eq!(vec.len(), 4);
     }
@@ -232,7 +288,7 @@ mod tests {
     #[test]
     fn test_from_smaller_array() {
         let arr = [0; 4];
-        let vec = LocalVec::<_, 6>::from_array(arr);
+        let vec = LocalVecImpl::<_, 6>::from_array(arr);
 
         assert_eq!(vec.len(), 4);
     }
@@ -240,7 +296,7 @@ mod tests {
     #[test]
     fn test_set_len() {
         let arr = [7; 4];
-        let mut vec = LocalVec::<_, 6>::from_array(arr);
+        let mut vec = LocalVecImpl::<_, 6>::from_array(arr);
 
         assert_eq!(vec.len(), 4);
         unsafe {
@@ -252,7 +308,7 @@ mod tests {
     #[test]
     fn test_take_array() {
         let arr = [7; 4];
-        let mut vec = LocalVec::<_, 6>::from_array(arr);
+        let mut vec = LocalVecImpl::<_, 6>::from_array(arr);
         assert_eq!(vec.len(), 4);
         let _ = vec.take_array();
         assert_eq!(vec.len(), 0);
@@ -261,7 +317,7 @@ mod tests {
     #[test]
     fn test_as_ptr() {
         let arr = [0xff; 3];
-        let vec = LocalVec::<_, 8>::from_array(arr);
+        let vec = LocalVecImpl::<_, 8>::from_array(arr);
         let ptr = vec.as_ptr();
         assert_eq!(ptr, &vec[0] as *const i32);
     }
@@ -269,21 +325,21 @@ mod tests {
     #[test]
     fn test_as_mut_ptr() {
         let arr = [0xff; 3];
-        let mut vec = LocalVec::<_, 8>::from_array(arr);
+        let mut vec = LocalVecImpl::<_, 8>::from_array(arr);
         let ptr = vec.as_mut_ptr();
         assert_eq!(ptr, &mut vec[0] as *mut i32);
     }
 
     #[test]
     fn test_as_ptr_zero_size() {
-        let vec = LocalVec::<u8, 0>::new();
+        let vec = LocalVecImpl::<u8, 0>::new();
         let ptr = vec.as_ptr();
         assert!(ptr.is_null());
     }
 
     #[test]
     fn test_as_mut_ptr_zero_size() {
-        let mut vec = LocalVec::<u8, 0>::new();
+        let mut vec = LocalVecImpl::<u8, 0>::new();
         let ptr = vec.as_mut_ptr();
         assert!(ptr.is_null());
     }
