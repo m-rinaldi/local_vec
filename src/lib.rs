@@ -1,18 +1,22 @@
 use std::mem::MaybeUninit;
 
+mod clone;
 mod drop;
 mod index;
 mod from;
 mod deref;
 mod iter;
 mod extend;
+mod eq;
 
 #[derive(Debug)]
 /// A fixed-capacity vector that directly stores its elements  
 pub struct LocalVec<T, const N: usize> {
     buf: [MaybeUninit<T>; N],
-    len: usize,
+    len: LenType,
 }
+
+type LenType = usize;
 
 impl<T, const N: usize> LocalVec<T, N> {
     pub fn new() -> Self {
