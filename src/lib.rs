@@ -8,6 +8,7 @@ mod deref;
 mod iter;
 mod extend;
 mod eq;
+mod default;
 
 /// A fixed-capacity vector that directly stores its elements  
 #[derive(Eq, PartialEq, Clone, Debug)]
@@ -84,6 +85,10 @@ impl<T, const N: usize> LocalVecImpl<T, N> {
         self.len
     }
 
+    /// Forces the length of the local vector to `new_len`
+    /// # Safety
+    /// - `new_len` must be less than or equal to [`capacity()`].
+    /// - The elements at `old_len..new_len` must be initialized.
     pub unsafe fn set_len(&mut self, len: usize) {
         self.len = len;
     }
@@ -116,8 +121,8 @@ impl<T, const N: usize> LocalVecImpl<T, N> {
     }
 
     pub fn clear(&mut self) {
-        while let Some(_) = self.pop() {
-        }
+        // TODO order should be the opposite of this (due to drop order)
+        while self.pop().is_some() {}
         debug_assert_eq!(self.len, 0);
     }
 
