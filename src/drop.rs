@@ -10,113 +10,110 @@ impl <T, const N: usize> Drop for LocalVec<T, N> {
 
 #[cfg(test)]
 mod tests {
-    struct CounterGuard(*mut u8);
-
-    impl<'a> CounterGuard {
-        pub fn new(cnt: &'a mut u8) -> CounterGuard {
-            *cnt += 1;
-            CounterGuard(cnt as *mut u8)
-        }
-    }
-
-    impl<'a> Drop for CounterGuard {
-        fn drop(&mut self) {
-            unsafe {
-                *self.0 -= 1;
-            }
-        }
-    }
-
     use crate::LocalVec;
+    use std::rc::Rc;
+
+    #[derive(Clone)]
+    struct Counter(Rc<()>);
+
+    impl Counter {
+        fn new() -> Self {
+            Self(Rc::new(()))
+        }
+
+        fn count(&self) -> usize {
+            Rc::strong_count(&self.0)
+        }
+    }
 
     #[test]
     fn test_drop() {
-        let mut cnt = 0u8;
+        let cnt = Counter::new();
         let mut buf = LocalVec::<_, 3>::new();
 
-        assert_eq!(cnt, 0);
+        assert_eq!(cnt.count(), 1);
 
-        buf.push(CounterGuard::new(&mut cnt));
-        assert_eq!(cnt, 1);
+        buf.push(cnt.clone());
+        assert_eq!(cnt.count(), 2);
 
-        buf.push(CounterGuard::new(&mut cnt));
-        assert_eq!(cnt, 2);
+        buf.push(cnt.clone());
+        assert_eq!(cnt.count(), 3);
 
-        buf.push(CounterGuard::new(&mut cnt));
-        assert_eq!(cnt, 3);
+        buf.push(cnt.clone());
+        assert_eq!(cnt.count(), 4);
 
         std::mem::drop(buf);
-        assert_eq!(cnt, 0);
+        assert_eq!(cnt.count(), 1);
     }
 
     #[test]
     fn test_drop_after_set_len() {
-        let mut cnt = 0u8;
+        let cnt = Counter::new();
         let mut buf = LocalVec::<_, 3>::new();
 
-        assert_eq!(cnt, 0);
+        assert_eq!(cnt.count(), 1);
 
-        buf.push(CounterGuard::new(&mut cnt));
-        assert_eq!(cnt, 1);
+        buf.push(cnt.clone());
+        assert_eq!(cnt.count(), 2);
 
-        buf.push(CounterGuard::new(&mut cnt));
-        assert_eq!(cnt, 2);
+        buf.push(cnt.clone());
+        assert_eq!(cnt.count(), 3);
 
-        buf.push(CounterGuard::new(&mut cnt));
-        assert_eq!(cnt, 3);
+        buf.push(cnt.clone());
+        assert_eq!(cnt.count(), 4);
 
         unsafe {
             buf.set_len(1);
         }
 
         std::mem::drop(buf);
-        assert_eq!(cnt, 2);
+        assert_eq!(cnt.count(), 3);
     }
 
     #[test]
     fn test_drop_after_into_array() {
-        let mut cnt = 0u8;
+        let cnt = Counter::new();
         let mut buf = LocalVec::<_, 3>::new();
 
-        assert_eq!(cnt, 0);
+        assert_eq!(cnt.count(), 1);
 
-        buf.push(CounterGuard::new(&mut cnt));
-        assert_eq!(cnt, 1);
+        buf.push(cnt.clone());
+        assert_eq!(cnt.count(), 2);
 
-        buf.push(CounterGuard::new(&mut cnt));
-        assert_eq!(cnt, 2);
+        buf.push(cnt.clone());
+        assert_eq!(cnt.count(), 3);
 
-        buf.push(CounterGuard::new(&mut cnt));
-        assert_eq!(cnt, 3);
+        buf.push(cnt.clone());
+        assert_eq!(cnt.count(), 4);
 
-        let arr: [_; 3] = buf.into();
-        assert_eq!(cnt, 3);
+        let arr: [Counter; 3] = buf.try_into().unwrap();
+        assert_eq!(cnt.count(), 4);
 
         std::mem::drop(arr);
-        assert_eq!(cnt, 0);
+        assert_eq!(cnt.count(), 1);
     }
 
     #[test]
     fn test_drop_after_take_array() {
-        let mut cnt = 0u8;
+        let cnt = Counter::new();
         let mut buf = LocalVec::<_, 3>::new();
 
-        assert_eq!(cnt, 0);
+        assert_eq!(cnt.count(), 1);
 
-        buf.push(CounterGuard::new(&mut cnt));
-        assert_eq!(cnt, 1);
+        buf.push(cnt.clone());
+        assert_eq!(cnt.count(), 2);
 
-        buf.push(CounterGuard::new(&mut cnt));
-        assert_eq!(cnt, 2);
+        buf.push(cnt.clone());
+        assert_eq!(cnt.count(), 3);
 
-        buf.push(CounterGuard::new(&mut cnt));
-        assert_eq!(cnt, 3);
+        buf.push(cnt.clone());
+        assert_eq!(cnt.count(), 4);
 
-        let arr = buf.take_array();
+        let arr = unsafe { buf.take_array() };
         assert_eq!(buf.len(), 0);
-        assert_eq!(cnt, 3);
+        assert_eq!(cnt.count(), 4);
 
         std::mem::drop(arr);
-        assert_eq!(cnt, 0);
+        assert_eq!(cnt.count(), 1);
     }
 }
