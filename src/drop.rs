@@ -89,7 +89,7 @@ mod tests {
         buf.push(CounterGuard::new(&mut cnt));
         assert_eq!(cnt, 3);
 
-        let arr: [_; 3] = buf.into();
+        let arr: [CounterGuard; 3] = buf.try_into().unwrap();
         assert_eq!(cnt, 3);
 
         std::mem::drop(arr);
@@ -112,7 +112,7 @@ mod tests {
         buf.push(CounterGuard::new(&mut cnt));
         assert_eq!(cnt, 3);
 
-        let arr = buf.take_array();
+        let arr = unsafe { buf.take_array() };
         assert_eq!(buf.len(), 0);
         assert_eq!(cnt, 3);
 
