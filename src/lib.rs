@@ -127,13 +127,23 @@ impl<T, const N: usize> LocalVecImpl<T, N> {
     }
 
     #[must_use = "consider using clear() instead"]
-    /// steal the elements stored
-    pub fn take_array(&mut self) -> [T; N] {
-        let arr: [T; N] = unsafe {
+    /// Takes possibly uninitialized elements.
+    pub fn take_uninit_array(&mut self) -> [MaybeUninit<T>; N] {
+        unsafe {
             self.set_len(0);
-            std::mem::transmute_copy(&self.buf)
-        };
-        arr
+            std::ptr::read(&self.buf)
+        }
+    }
+
+    #[must_use = "consider using clear() instead"]
+    /// Takes the stored elements.
+    ///
+    /// # Safety
+    /// The container must be full.
+    pub unsafe fn take_array(&mut self) -> [T; N] {
+        debug_assert!(self.is_full());
+        let prev = std::mem::replace(self, LocalVecImpl::new());
+        std::mem::transmute_copy(&prev.buf)
     }
 
     #[inline]
@@ -312,10 +322,20 @@ mod tests {
 
     #[test]
     fn test_take_array() {
+        let arr = [2; 4];
+        let mut vec = LocalVecImpl::<_, 4>::from_array(arr);
+        assert_eq!(vec.len(), 4);
+        let taken = unsafe { vec.take_array() };
+        assert_eq!(arr, taken);
+        assert_eq!(vec.len(), 0);
+    }
+
+    #[test]
+    fn test_take_uninit_array() {
         let arr = [7; 4];
         let mut vec = LocalVecImpl::<_, 6>::from_array(arr);
         assert_eq!(vec.len(), 4);
-        let _ = vec.take_array();
+        let _ = vec.take_uninit_array();
         assert_eq!(vec.len(), 0);
     }
 
